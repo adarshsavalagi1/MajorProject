@@ -4,7 +4,8 @@ from fastapi import APIRouter, UploadFile, HTTPException
 from models.ApiResponse import ApiResponse
 from PyPDF2 import PdfReader
 
-from utils.db import delete_chat, get_all_chats, insert_chat
+from utils.db import delete_chat, get_all_chats, insert_chat, insert_chunk
+from utils.pdf_helpers import extract_table_of_contents, process_chapters
 
 
 # Create a router instance
@@ -36,8 +37,10 @@ async def new_chat(file: UploadFile):
         raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
     page_numbers = len(PdfReader(file_location).pages)
     id = insert_chat(file.filename, file_location, page_numbers)
-
-    
+    chunks = extract_table_of_contents(file_location)
+    chapters = process_chapters(file_location, chunks)
+    for chapter in chapters:
+        insert_chunk(id, chapter["start_page"], chapter["end_page"], chapter["content"], chapter["title"], chapter["index"])
     # Respond with extracted text and file location
     response: Dict[str, str] = {
         "filename": file.filename,
@@ -55,7 +58,6 @@ async def get_all_chat():
     Function to get all chat sessions from the database.
     """
     try:
-        # Get all chat sessions from the database
         chats = get_all_chats()
         return ApiResponse.success("Chat sessions retrieved successfully.", chats)
     except Exception as e:
@@ -70,7 +72,6 @@ async def delete_chat_by_id(chat_id: int):
         chat_id: ID of the chat session to be deleted.
     """
     try:
-        # Placeholder for delete operation
         delete_chat(chat_id)
         return ApiResponse.success(f"Chat session with ID {chat_id} deleted successfully.")
     except Exception as e:

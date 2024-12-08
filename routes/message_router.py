@@ -1,9 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter 
 from pydantic import BaseModel
-
 from models.ApiResponse import ApiResponse
 from utils.chat import get_response
-from utils.db import get_all_chats, get_all_message, get_data, insert_message
+from utils.db import get_data, insert_message
 
 
 router = APIRouter()
