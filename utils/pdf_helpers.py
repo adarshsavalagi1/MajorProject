@@ -61,7 +61,7 @@ def extract_table_of_contents(pdf_path):
                         title_cleaned = clean_title(title.strip())
                         
                         # Check if valid title and page
-                        if not has_no_alphabets(title_cleaned) and int(page) < len(pdf_reader.pages):
+                        if not has_no_alphabets(title_cleaned) and int(page) < len(pdf_reader.pages) and title and page and page.isnum() :
                             contents.append((title_cleaned, int(page)))
                             if title_cleaned.lower() == 'answers':
                                 # Break out of the outer loop when "answers" is encountered

@@ -29,7 +29,7 @@ async def create_chat(id: int, chat_request: ChatRequest):
     """
     try:
         prev_data = get_data(id)
-        res = get_response(prev_data, chat_request.prompt)
+        res = get_response( prev_data,chat_request.prompt,  id)
         insert_message(id, chat_request.prompt, res)
         chats = get_data(id)
         return ApiResponse.success("Chat sessions retrieved successfully.", chats)

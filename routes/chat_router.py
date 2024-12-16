@@ -35,6 +35,7 @@ async def new_chat(file: UploadFile):
             buffer.write(await file.read())
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+    
     page_numbers = len(PdfReader(file_location).pages)
     id = insert_chat(file.filename, file_location, page_numbers)
     chunks = extract_table_of_contents(file_location)
@@ -47,7 +48,6 @@ async def new_chat(file: UploadFile):
         "saved_path": file_location,
         "chat_id": id,
         "pages": page_numbers
-
     }
 
     return ApiResponse.success("New chat session created and file saved successfully.", response)
